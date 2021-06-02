@@ -7225,16 +7225,8 @@ out:
 
 static bool ufshcd_wb_sup(struct ufs_hba *hba)
 {
-#if defined(CONFIG_UFSTW_31)
-	if (IS_SAMSUNG_DEVICE(storage_mfrid))
-		return false;
-	else
-		return (hba->dev_info.d_ext_ufs_feature_sup &
-			UFS_DEV_WRITE_BOOSTER_SUP);
-#else
-	return (hba->dev_info.d_ext_ufs_feature_sup &
-		UFS_DEV_WRITE_BOOSTER_SUP);
-#endif
+	return !!(hba->dev_info.d_ext_ufs_feature_sup &
+		  UFS_DEV_WRITE_BOOSTER_SUP);
 }
 
 static int ufshcd_wb_ctrl(struct ufs_hba *hba, bool enable)
