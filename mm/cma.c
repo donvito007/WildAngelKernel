@@ -34,7 +34,7 @@
 #include <linux/delay.h>
 #include <linux/show_mem_notifier.h>
 #include <trace/events/cma.h>
-
+#include <linux/vmpressure.h>
 #include "cma.h"
 
 struct cma cma_areas[MAX_CMA_AREAS];

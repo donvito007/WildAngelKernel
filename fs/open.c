@@ -37,7 +37,7 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/fs.h>
 
-int do_truncate(struct dentry *dentry, loff_t length, unsigned int time_attrs,
+int do_truncate(struct vfsmount *mnt,struct dentry *dentry, loff_t length, unsigned int time_attrs,
 	struct file *filp)
 {
 	int ret;
@@ -112,7 +112,7 @@ long vfs_truncate(const struct path *path, loff_t length)
 	if (!error)
 		error = security_path_truncate(path);
 	if (!error)
-		error = do_truncate2(mnt, path->dentry, length, 0, NULL);
+		error = do_truncate(mnt, path->dentry, length, 0, NULL);
 
 put_write_and_out:
 	put_write_access(inode);
@@ -199,7 +199,7 @@ long do_sys_ftruncate(unsigned int fd, loff_t length, int small)
 	if (!error)
 		error = security_path_truncate(&f.file->f_path);
 	if (!error)
-		error = do_truncate2(mnt, dentry, length, ATTR_MTIME|ATTR_CTIME, f.file);
+		error = do_truncate(mnt, dentry, length, ATTR_MTIME|ATTR_CTIME, f.file);
 	sb_end_write(inode->i_sb);
 out_putf:
 	fdput(f);

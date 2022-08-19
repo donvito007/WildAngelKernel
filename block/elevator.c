@@ -991,7 +991,7 @@ int elevator_init_mq(struct request_queue *q)
 
 	e = elevator_get(q, "bfq", false);
 	if (!e)
-		goto out_unlock;
+		goto out;
 
 	if (IS_ENABLED(CONFIG_IOSCHED_BFQ)) {
 		e = elevator_get(q, "bfq", false);

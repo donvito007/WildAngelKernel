@@ -69,7 +69,7 @@
 #include <net/sock.h>
 #include <net/ip.h>
 #include "slab.h"
-
+#include <linux/vmpressure.h>
 #include <linux/uaccess.h>
 
 #include <trace/events/vmscan.h>

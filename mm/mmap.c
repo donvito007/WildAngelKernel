@@ -995,8 +995,9 @@ again:
 			end = next->vm_end;
 			goto again;
 		}
-		else if (next)
+		else if (next){
 			vma_gap_update(next);
+		}
 		else {
 			/*
 			 * If remove_next == 2 we obviously can't
@@ -1018,7 +1019,6 @@ again:
 			 * in remove_next == 1 case.
 			 */
 			VM_WARN_ON(mm->highest_vm_end != vm_end_gap(vma));
-		}
 	}
 	if (insert && file)
 		uprobe_mmap(insert);
