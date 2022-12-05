@@ -975,8 +975,8 @@ out:
 }
 
 /*
- * For blk-mq devices, we default to using mq-deadline, if available, for single
- * queue devices.  If deadline isn't available OR we have multiple queues,
+ * For blk-mq devices, we default to using bfq, if available, for single
+ * queue devices.  If bfq isn't available OR we have multiple queues,
  * default to "none".
  */
 int elevator_init_mq(struct request_queue *q)
@@ -989,8 +989,9 @@ int elevator_init_mq(struct request_queue *q)
 
 	WARN_ON_ONCE(test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags));
 
-	if (unlikely(q->elevator))
-		goto out;
+	e = elevator_get(q, "bfq", false);
+	if (!e)
+		goto out_unlock;
 
 	if (IS_ENABLED(CONFIG_IOSCHED_BFQ)) {
 		e = elevator_get(q, "bfq", false);

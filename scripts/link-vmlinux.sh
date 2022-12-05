@@ -136,27 +136,31 @@ recordmcount()
 vmlinux_link()
 {
 	local lds="${objtree}/${KBUILD_LDS}"
+	local extra_lds=""
 	local objects
 
 	if [ "${SRCARCH}" != "um" ]; then
-		if [ -z "${CONFIG_LTO_CLANG}" ]; then
-			objects="--whole-archive		\
-				built-in.a			\
-				--no-whole-archive		\
-				--start-group			\
-				${KBUILD_VMLINUX_LIBS}		\
-				--end-group			\
-				${1}"
-		else
-			objects="--start-group			\
-				vmlinux.o			\
-				--end-group			\
-				${1}"
-		fi
+		for extra_ld in ${KBUILD_EXTRA_LDS}
+		do
+			extra_lds="$extra_lds -T ${objtree}/$extra_ld"
+		done
+
+		objects="--whole-archive			\
+			built-in.a				\
+			--no-whole-archive			\
+			--start-group				\
+			${KBUILD_VMLINUX_LIBS}			\
+			--end-group				\
+			${1}"
 
 		${LD} ${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux} -o ${2}	\
-			-T ${lds} ${objects}
+			-T ${lds} ${extra_lds} ${objects}
 	else
+		for extra_ld in ${KBUILD_EXTRA_LDS}
+		do
+			extra_lds="$extra_lds -Wl,-T,${objtree}/$extra_ld"
+		done
+
 		objects="-Wl,--whole-archive			\
 			built-in.a				\
 			-Wl,--no-whole-archive			\
@@ -167,6 +171,7 @@ vmlinux_link()
 
 		${CC} ${CFLAGS_vmlinux} -o ${2}			\
 			-Wl,-T,${lds}				\
+			${extra_lds}				\
 			${objects}				\
 			-lutil -lrt -lpthread
 		rm -f linux
