@@ -216,7 +216,7 @@ use_llvm_for_gcc() {
 		if [[ $DISABLE_LLD == "1" ]]; then
 			MAKEOPTS="AR=${PFX_OVERRIDE}llvm-ar AS=${PFX_OVERRIDE}llvm-as NM=${PFX_OVERRIDE}llvm-nm STRIP=${PFX_OVERRIDE}llvm-strip
 						OBJCOPY=${PFX_OVERRIDE}llvm-objcopy OBJDUMP=${PFX_OVERRIDE}llvm-objdump READELF=${PFX_OVERRIDE}llvm-readelf
-						HOSTAR=${PFX_OVERRIDE}llvm-ar HOSTAS=${PFX_OVERRIDE}llvm-as"
+						HOSTAR=${PFX_OVERRIDE}llvm-ar HOSTAS=${PFX_OVERRIDE}llvm-as -z combreloc"
 		else
 			if [[ $DISABLE_IAS == "1" ]]; then
 				MAKEOPTS="LD=${PFX_OVERRIDE}ld.lld AR=${PFX_OVERRIDE}llvm-ar NM=${PFX_OVERRIDE}llvm-nm STRIP=${PFX_OVERRIDE}llvm-strip
@@ -312,26 +312,9 @@ get_gcc-4.9-aosp() {
 get_proton_clang-13.0() {
 
 	TC="$TOOLCHAIN_DIR/proton-clang-13.0"
-	REPO="https://github.com/kdrag0n/proton-clang"
-	BRANCH="master"
-
-	if [[ $USER != "$USER_OVERRIDE" ]]; then
-
-		git_clone "${REPO}" "${BRANCH}" "${TC}" &
-		check_updates_from_github "${REPO}" "${BRANCH}" "${TC}" &
-
-		wait
-
-		TC="$TC/$(echo ${REPO} | cut -f5 -d/)-${BRANCH}"
-	else
-		git_clone "${REPO}" "${BRANCH}" "${TC}"
-		check_updates_from_github "${REPO}" "${BRANCH}" "${TC}"
-	fi
 
 	CROSS="$TC/bin/aarch64-linux-gnu-"
 	CROSS_ARM32="$TC/bin/arm-linux-gnueabi-"
-
-	PFX_OVERRIDE=""
 
 	MAKEOPTS="CC=clang LD=${PFX_OVERRIDE}ld.lld AR=${PFX_OVERRIDE}llvm-ar AS=${PFX_OVERRIDE}llvm-as NM=${PFX_OVERRIDE}llvm-nm STRIP=${PFX_OVERRIDE}llvm-strip
 				OBJCOPY=${PFX_OVERRIDE}llvm-objcopy OBJDUMP=${PFX_OVERRIDE}llvm-objdump READELF=${PFX_OVERRIDE}llvm-readelf
@@ -339,7 +322,7 @@ get_proton_clang-13.0() {
 
 	if [[ $DISABLE_LLD == "1" ]]; then
 		MAKEOPTS="CC=clang AR=${PFX_OVERRIDE}llvm-ar AS=${PFX_OVERRIDE}llvm-as NM=${PFX_OVERRIDE}llvm-nm STRIP=${PFX_OVERRIDE}llvm-strip
-					OBJCOPY=${PFX_OVERRIDE}llvm-objcopy OBJDUMP=${PFX_OVERRIDE}llvm-objdump READELF=${PFX_OVERRIDE}llvm-readelf
+				        OBJDUMP=${PFX_OVERRIDE}llvm-objdump READELF=${PFX_OVERRIDE}llvm-readelf
 					HOSTAR=${PFX_OVERRIDE}llvm-ar HOSTAS=${PFX_OVERRIDE}llvm-as"
 	else
 		if [[ $DISABLE_IAS == "1" ]]; then
@@ -708,7 +691,7 @@ build() {
 
 	BUILD_START=$(date +"%s")
 
-	MAKEOPTS="CONFIG_DEBUG_SECTION_MISMATCH=y $MAKEOPTS"
+	MAKEOPTS="$MAKEOPTS"
 	if [[ $BUILD_DTBO_IMG == "1" || ${1} == "dtbs"  ]]; then
 		MAKEOPTS="CONFIG_BUILD_ARM64_DT_OVERLAY=y $MAKEOPTS"
 	fi
